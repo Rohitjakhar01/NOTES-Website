@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Notes App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        footer {
+  text-align: center ;
+  justify-content: center;
+  padding: 15px;
+  font-size: 14px;
+  opacity: 1;
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+            display: flexbox;
+            flex-direction: column;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+            animation: fadeDown 1s ease;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            flex:1;
+        }
+
+        .top-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            animation: fadeUp 1s ease;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 10px;
+            background: #00c9a7;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #00a98b;
+            transform: scale(1.05);
+        }
+
+        .notes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .note {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px;
+            position: relative;
+            animation: pop 0.4s ease;
+            transition: 0.3s;
+        }
+
+        .note:hover {
+            transform: translateY(-5px);
+        }
+
+        .note textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            resize: none;
+            font-size: 15px;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: crimson;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .search {
+            margin-bottom: 15px;
+            animation: fadeUp 1.2s ease;
+        }
+
+        @keyframes pop {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>📝 Smart Notes App</h1>
+
+        <div class="top-bar">
+            <input type="text" id="noteInput" placeholder="Write a new note...">
+            <button onclick="addNote()">Add</button>
+        </div>
+
+        <input type="text" id="search" class="search" placeholder="🔍 Search notes..." onkeyup="searchNotes()">
+
+        <div class="notes" id="notesContainer"></div>
+    </div>
+
+    <script>
+        let notes = JSON.parse(localStorage.getItem("notes")) || [];
+
+        function saveNotes() {
+            localStorage.setItem("notes", JSON.stringify(notes));
+        }
+
+        function renderNotes(filteredNotes = notes) {
+            const container = document.getElementById("notesContainer");
+            container.innerHTML = "";
+
+            filteredNotes.forEach((note, index) => {
+                const div = document.createElement("div");
+                div.className = "note";
+
+                div.innerHTML = `
+          <div class="delete-btn" onclick="deleteNote(${index})">×</div>
+          <textarea oninput="editNote(${index}, this.value)">${note}</textarea>
+        `;
+
+                container.appendChild(div);
+            });
+        }
+
+        function addNote() {
+            const input = document.getElementById("noteInput");
+            if (input.value.trim() === "") return;
+
+            notes.push(input.value);
+            input.value = "";
+            saveNotes();
+            renderNotes();
+        }
+
+        function deleteNote(index) {
+            notes.splice(index, 1);
+            saveNotes();
+            renderNotes();
+        }
+
+        function editNote(index, value) {
+            notes[index] = value;
+            saveNotes();
+        }
+
+        function searchNotes() {
+            const query = document.getElementById("search").value.toLowerCase();
+            const filtered = notes.filter(n => n.toLowerCase().includes(query));
+            renderNotes(filtered);
+        }
+
+        renderNotes();
+    </script>
+<footer>
+  <p>✨ Made with ❤️ by <span>Rohit Jakhar</span></p>
+</footer>
+</body>
+
+</html>
